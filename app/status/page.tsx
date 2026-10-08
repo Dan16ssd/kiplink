@@ -1,6 +1,8 @@
 "use client";
+import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Shell, Btn, Label, Pill, Err, TxLink, fmt } from "@/components/ui";
 
 function Step({ done, n, title, sub }: { done: boolean; n: number; title: string; sub?: string }) {
@@ -14,13 +16,13 @@ function Step({ done, n, title, sub }: { done: boolean; n: number; title: string
 
 const left = (s: number) => `${Math.floor(s / 3600)} h ${Math.floor((s % 3600) / 60)} min`;
 
-export default function Status() {
-  const { id } = useParams<{ id: string }>();
+function Status() {
+  const id = useSearchParams().get("id") ?? "";
   const [t, setT] = useState<any>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const load = () => fetch(`/api/transfers/${id}`).then((r) => r.json()).then(setT).catch(() => {});
+  const load = () => api(`/api/transfers/${id}`).then((r) => r.json()).then(setT).catch(() => {});
   useEffect(() => {
     load();
     const i = setInterval(load, 3000);
@@ -29,7 +31,7 @@ export default function Status() {
 
   async function post(path: string, body?: object) {
     setBusy(true); setErr("");
-    const r = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+    const r = await api(path, { method: "POST", headers: { "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
     if (!r.ok) setErr((await r.json()).error || "Something went wrong.");
     await load();
     setBusy(false);
@@ -49,7 +51,7 @@ export default function Status() {
       </div>
       <div>
         <Step done n={1} title="Baht paid" sub="Simulated payment" />
-        <Step done n={2} title="Locked in escrow" sub="Test network, confirmed" />
+        <Step done n={2} title="Locked in escrow" sub={t.preview ? "Simulated in preview, no blockchain" : "Test network, confirmed"} />
         {t.status === "refunded" ? (
           <Step done n={3} title="Refunded to you" sub="Timeout passed, unclaimed" />
         ) : (
@@ -77,4 +79,8 @@ export default function Status() {
       )}
     </Shell>
   );
+}
+
+export default function Page() {
+  return <Suspense><Status /></Suspense>;
 }

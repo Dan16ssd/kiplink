@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PREVIEW } from "@/lib/api";
 
 export function Shell({ title, lao, children, receiver = false }: { title: string; lao?: string; children: React.ReactNode; receiver?: boolean }) {
   return (
@@ -7,6 +8,7 @@ export function Shell({ title, lao, children, receiver = false }: { title: strin
         <Link href="/" className="text-lg font-extrabold">{title}</Link>
         {lao && <span className="lao rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">{lao}</span>}
       </header>
+      {PREVIEW && <p className="bg-blue-100 px-5 py-2 text-xs font-semibold text-blue-900">Preview: no blockchain here. Everything on this page is simulated in your browser.</p>}
       <div className="flex flex-1 flex-col gap-4 p-5">{children}</div>
     </main>
   );
@@ -40,6 +42,7 @@ export const Err = ({ msg }: { msg: string }) =>
 export const fmt = (n: number) => n.toLocaleString("en-US");
 
 export function TxLink({ hash, url, label }: { hash: string; url: string; label: string }) {
+  if (PREVIEW) return <span className="text-sm font-semibold text-blue-700">{label}: no blockchain transaction in preview</span>;
   const short = `${hash.slice(0, 8)}…${hash.slice(-6)}`;
   return url ? (
     <a href={url} target="_blank" rel="noreferrer" className="break-all font-mono text-sm font-bold text-blue-600 underline">{label} {short}</a>

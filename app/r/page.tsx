@@ -1,13 +1,15 @@
 "use client";
+import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Shell, Sim, TxLink, fmt } from "@/components/ui";
 
-export default function Claimed() {
-  const { id } = useParams<{ id: string }>();
+function Claimed() {
+  const id = useSearchParams().get("id") ?? "";
   const [t, setT] = useState<any>(null);
-  useEffect(() => { fetch(`/api/transfers/${id}?role=receiver`).then((r) => r.json()).then(setT); }, [id]);
+  useEffect(() => { api(`/api/transfers/${id}?role=receiver`).then((r) => r.json()).then(setT); }, [id]);
   if (!t) return <Shell title="KipLink" receiver><p>Loading…</p></Shell>;
 
   return (
@@ -29,4 +31,8 @@ export default function Claimed() {
       <Link href="/receive" className="text-center text-sm font-bold text-blue-600 underline">Back</Link>
     </Shell>
   );
+}
+
+export default function Page() {
+  return <Suspense><Claimed /></Suspense>;
 }

@@ -8,6 +8,7 @@
     "node": "hardhat node",
     "dev": "next dev",
     "build": "next build",
+    "build:pages": "node scripts/build-pages.js",
     "deploy:local": "hardhat run scripts/deploy.js --network localhost"
   },
   "devDependencies": {

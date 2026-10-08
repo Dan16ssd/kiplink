@@ -1,4 +1,5 @@
 "use client";
+import { api } from "@/lib/api";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Shell, Pill, Label, fmt } from "@/components/ui";
@@ -8,7 +9,7 @@ const SENDER = "noy";
 export default function Home() {
   const [rows, setRows] = useState<any[] | null>(null);
   useEffect(() => {
-    const load = () => fetch(`/api/transfers?user=${SENDER}`).then((r) => r.json()).then(setRows).catch(() => {});
+    const load = () => api(`/api/transfers?user=${SENDER}`).then((r) => r.json()).then(setRows).catch(() => {});
     load();
     const t = setInterval(load, 4000);
     return () => clearInterval(t);
@@ -28,7 +29,7 @@ export default function Home() {
         {rows === null && <p className="text-sm text-slate-500">Loading…</p>}
         {rows?.length === 0 && <p className="text-sm text-slate-500">No transfers yet.</p>}
         {rows?.map((t) => (
-          <Link key={t.id} href={`/status/${t.id}`} className="flex items-center justify-between gap-3 border-b border-blue-100 py-3 last:border-0">
+          <Link key={t.id} href={`/status?id=${t.id}`} className="flex items-center justify-between gap-3 border-b border-blue-100 py-3 last:border-0">
             <div>
               <b>{t.receiverName}</b>
               <div className="text-xs text-slate-500">{new Date(t.createdAt).toLocaleDateString()} · {fmt(t.amountThb)} THB</div>

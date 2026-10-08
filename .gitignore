@@ -10,3 +10,5 @@ deployments
 data
 *.log
 next-env.d.ts
+out
+.api-aside

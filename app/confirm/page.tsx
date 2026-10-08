@@ -1,4 +1,5 @@
 "use client";
+import { api } from "@/lib/api";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Shell, Btn, Label, Sim, Err, fmt } from "@/components/ui";
@@ -14,7 +15,7 @@ function Confirm() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    fetch(`/api/quote?amount=${amount}`).then(async (r) => {
+    api(`/api/quote?amount=${amount}`).then(async (r) => {
       const j = await r.json();
       r.ok ? setQ(j) : setErr(j.error);
     });
@@ -22,13 +23,13 @@ function Confirm() {
 
   async function pay() {
     setBusy(true); setErr("");
-    const r = await fetch("/api/transfers", {
+    const r = await api("/api/transfers", {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ senderId: "noy", receiverId: to?.id, amountThb: amount }),
     });
     const j = await r.json();
     if (!r.ok) { setErr(j.error || "Something went wrong. Try again."); setBusy(false); return; }
-    router.push(`/status/${j.id}`);
+    router.push(`/status?id=${j.id}`);
   }
 
   const rows: [string, string | undefined][] = [
@@ -54,7 +55,7 @@ function Confirm() {
       <Sim>Demo rates · simulated pay-in</Sim>
       <Err msg={err} />
       <div className="flex-1" />
-      {busy && <p className="text-center text-sm font-semibold text-blue-700">Sending to the network. This can take up to a minute.</p>}
+      {busy && <p className="text-center text-sm font-semibold text-blue-700">Sending. This can take up to a minute.</p>}
       <Btn disabled={!q || busy} onClick={pay} lao="ການຈ່າຍຈຳລອງ">{busy ? "Sending…" : `Pay ${fmt(amount)} THB (simulated payment)`}</Btn>
       <Btn ghost disabled={busy} onClick={() => router.back()}>Back</Btn>
     </Shell>

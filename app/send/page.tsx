@@ -1,4 +1,5 @@
 "use client";
+import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shell, Btn, Label, Err, fmt } from "@/components/ui";
@@ -16,7 +17,7 @@ export default function Send() {
   useEffect(() => {
     const n = Number(amount);
     const t = setTimeout(() => {
-      fetch(`/api/quote?amount=${n}`).then(async (r) => {
+      api(`/api/quote?amount=${n}`).then(async (r) => {
         const j = await r.json();
         if (r.ok) { setQuote(j); setErr(""); } else { setQuote(null); setErr(j.error); }
       });

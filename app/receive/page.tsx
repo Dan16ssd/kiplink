@@ -1,4 +1,5 @@
 "use client";
+import { api } from "@/lib/api";
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -13,7 +14,7 @@ function Receive() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    const load = () => fetch(`/api/transfers?user=${u}&role=receiver`).then((r) => r.json()).then(setRows).catch(() => {});
+    const load = () => api(`/api/transfers?user=${u}&role=receiver`).then((r) => r.json()).then(setRows).catch(() => {});
     setRows(null);
     load();
     const i = setInterval(load, 3000);
@@ -25,9 +26,9 @@ function Receive() {
 
   async function claim() {
     setBusy(true); setErr("");
-    const r = await fetch(`/api/transfers/${incoming.id}/claim`, { method: "POST" });
+    const r = await api(`/api/transfers/${incoming.id}/claim`, { method: "POST" });
     if (!r.ok) { setErr((await r.json()).error || "Could not claim. Try again."); setBusy(false); return; }
-    router.push(`/r/${incoming.id}`);
+    router.push(`/r?id=${incoming.id}`);
   }
 
   return (
@@ -48,14 +49,14 @@ function Receive() {
           <p className="lao text-xs text-slate-500">Claim code · ລະຫັດຮັບເງິນ</p>
           <Err msg={err} />
           <div className="flex-1" />
-          {busy && <p className="text-sm font-semibold text-blue-700">Claiming on the network…</p>}
+          {busy && <p className="text-sm font-semibold text-blue-700">Claiming…</p>}
           <Btn large disabled={busy} onClick={claim} lao="ຮັບເງິນ">{busy ? "Claiming…" : "Claim"}</Btn>
         </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
           <p className="text-2xl font-bold text-blue-900">{rows === null ? "Loading…" : "No money waiting"}</p>
           <p className="lao text-slate-500">ຍັງບໍ່ມີເງິນເຂົ້າ</p>
-          {lastClaimed && <Link className="font-bold text-blue-600 underline" href={`/r/${lastClaimed.id}`}>Last receipt</Link>}
+          {lastClaimed && <Link className="font-bold text-blue-600 underline" href={`/r?id=${lastClaimed.id}`}>Last receipt</Link>}
         </div>
       )}
     </Shell>
