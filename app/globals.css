@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { @apply bg-blue-50 text-slate-900 font-sans; }
+.lao { font-family: "Noto Sans Lao", "Figtree", sans-serif; }

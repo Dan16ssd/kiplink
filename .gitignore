@@ -7,3 +7,6 @@ typechain-types
 coverage
 deployments
 .claude
+data
+*.log
+next-env.d.ts
